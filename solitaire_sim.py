@@ -46,7 +46,7 @@ class settings:
         estimated_actions = total_seconds / self.seconds_per_action_per_action # divide the available time by action
 
         return int(estimated_actions) # Return a whole number of actions.
-    @dataclass
+ @dataclass
     class GameResult:
         banked_points: int #These are the points secured through banking.
 
@@ -57,15 +57,54 @@ class settings:
         won: bool # True when final score reaches the minimum.
 
         actions_used: int # Number of simulated actions used.
-    @dataclass
+ @dataclass
     class Card:
         rank: int # Rank ranges from 1 through 13(Ace-King)
 
         suit:str # Suit uses a name, Clubs, Spades, Diamond, y Hearts.
-    @dataclass 
+  @dataclass 
     class Foundation:
         suit:str
 
         cards:list #Stores what cards have not been banked
-def count_reached_checkpoints(foundation_rank):
-    reached = 0 # Begin with no completed checkpoints
+        def can_add_card(self, card): # The card must match the foundation's suit
+            if card.suit != self.suit: # This will ensure the card match's the foundations suit
+                return False
+            if len(self.cards) == 0: # Any card may begin an empty foundaion
+                return True
+            top_card = self.cards[-1] # This will retrieve the last card
+            return card.rank == top_card.rank + 1 # Ensures that the order of cards is ascending.
+        
+        def add_card(self, card):
+            if not self.can_add_card(card): #THis will reject illegal placements
+                return False
+            self.card.append(card) #Places cards into foundation
+            return True # Report a succesful placement.
+
+        def available_intervals(self):
+            intervals = len(self.cards) // BANK_INTERVAL
+
+            return intervals
+        def is_complete_foundation(self):
+            if len(self.cards) != FULL_FOUNDATION_SIZE:
+                return False
+
+            if self.cards[0].rank ! 1:
+                return False
+
+            if self.cards[-1].rank != 13:
+                return False # the rules guarentee matching suits and ascending ranks between ace and king.
+
+            return True
+
+        def can_bank(self):
+            if len(self.cards) == 0:
+                return False    
+
+            if self.is_complete_foundation():
+                return True
+
+            return len(self.cards) % BANK_INTERVAL == 0 #DAMN YOU GITBGASH
+
+
+  
